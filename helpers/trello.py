@@ -91,13 +91,18 @@ def check_cards_update(context: CallbackContext):
 
     print('[Trello]New Card: {} | Removed Card: {} | Renamed Card: {} | Moved Card: {}'.format(str(len(new_cards)), str(len(removed_cards)), str(len(renamed_cards)), str(len(moved_cards))))
 
+    has_update = False
     if len(new_cards) > 0:
+        has_update = True
         insert_db_cards(new_cards)
     if len(removed_cards) > 0:
+        has_update = True
         remove_db_cards(removed_cards)
     if len(renamed_cards) > 0:
+        has_update = True
         update_db_cards(renamed_cards)
     if len(moved_cards) > 0:
+        has_update = True
         update_db_cards(moved_cards)
 
     print('[Trello]DB Updated')
@@ -118,4 +123,5 @@ def check_cards_update(context: CallbackContext):
         text += '\nCard "<a href="{}">{}</a>" has been moved to "{}"'.format(card['url'], card['name'], card['list'])
 
     for chat_id in GROUP_IDS:
+        if has_update:
             context.bot.sendMessage(chat_id=chat_id, text=text, parse_mode='HTML')
